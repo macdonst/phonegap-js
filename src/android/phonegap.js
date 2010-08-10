@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // Intercept calls to document.addEventListener and watch for deviceready
-PhoneGap._document_addEventListener = document.addEventListener;
+PhoneGap.m_document_addEventListener = document.addEventListener;
 
 document.addEventListener = function(evt, handler, capture) {
     if (evt.toLowerCase() == 'deviceready') {
@@ -181,13 +181,32 @@ document.addEventListener = function(evt, handler, capture) {
             PhoneGap.onDeviceReady.subscribeOnce(handler);
         }
     } else {
-        PhoneGap._document_addEventListener.call(document, evt, handler);
+        PhoneGap.m_document_addEventListener.call(document, evt, handler);
     }
 };
+
+// Intercept calls to Element.addEventListener for some platforms
+PhoneGap.m_element_addEventListener = Element.prototype.addEventListener;
+
+/**
+ * For BlackBerry, the touchstart event does not work so we need to do click
+ * events when touchstart events are attached.
+ */
+/*
+Element.prototype.addEventListener = function(evt, handler, capture) {
+    if (evt === 'touchstart') {
+        evt = 'click';
+    }
+    PhoneGap.m_element_addEventListener.call(this, evt, handler, capture);
+};
+*/
+
+
 
 PhoneGap.watchId = 0;
 PhoneGap.callbackId = 0;
 PhoneGap.callbacks = {};
+PhoneGap.callbacksWatch = {};
 
 /**
  * Exec is always async since not all platforms can get back immediate return values.
@@ -233,7 +252,8 @@ PhoneGap.clearWatch = function(clazz, watchId) {
     }
     // If no watches exist then stop this guy
     if (noWatches) {
-        PhoneGap.execWatchStop(clazz, 'stop');
+        delete PhoneGap.callbacksWatch[clazz];
+        CommandManager.execStopWatch(clazz, 'stop');
     }
 };
 
