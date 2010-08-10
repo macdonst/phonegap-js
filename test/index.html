@@ -7,8 +7,10 @@
     <link rel="stylesheet" type="text/css" href="qunit.css" />
 	<script type="text/javascript" src="qunit.js"></script>
 	<!-- Make sure you copy in phonegap.js from the PhoneGap repository (that's what you're testing, right?) -->
-    <script type="text/javascript" src="phonegap.js"></script>
+    <script type="text/javascript" src="../src/android/phonegap.js"></script>
 	<script type="text/javascript">
+		PhoneGap.desktop = true;
+		
 		function Tests() {
 			this.TEST_TIMEOUT = 15000;
 		};
@@ -25,7 +27,7 @@
 
 		document.addEventListener('deviceready', run, false);
 	</script>
-	<script type="text/javascript" src="tests/phonegap.tests.js"></script>
+	<script type="text/javascript" src="tests/phonegap.test.js"></script>
   </head>
 	<body>
 		<h1 id="qunit-header">Mobile Spec (PhoneGap) Tests</h1>

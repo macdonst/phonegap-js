@@ -5,6 +5,7 @@
  */
 var PhoneGap = { };
 
+PhoneGap.desktop = false;
 
 /**
  * Custom pub-sub channel that can have functions subscribed to it
@@ -174,35 +175,26 @@ PhoneGap._document_addEventListener = document.addEventListener;
 
 document.addEventListener = function(evt, handler, capture) {
     if (evt.toLowerCase() == 'deviceready') {
-        PhoneGap.onDeviceReady.subscribeOnce(handler);
+        if (PhoneGap.desktop) {
+            window.onload = handler;
+        } else {
+            PhoneGap.onDeviceReady.subscribeOnce(handler);
+        }
     } else {
         PhoneGap._document_addEventListener.call(document, evt, handler);
     }
 };
 
-
+PhoneGap.watchId = 0;
 PhoneGap.callbackId = 0;
 PhoneGap.callbacks = {};
 
 /**
- * Execute a PhoneGap command in a queued fashion, to ensure commands do not
- * execute with any race conditions, and only run when PhoneGap is ready to
- * recieve them.
- * @param {String} command Command to be run in PhoneGap, e.g. "ClassName.method"
- * @param {String[]} [args] Zero or more arguments to pass to the method
+ * Exec is always async since not all platforms can get back immediate return values.
+ * This will return a value on platforms that support it.
  */
-PhoneGap.exec = function(clazz, action, args) {
-	return CommandManager.exec(clazz, action, callbackId, JSON.stringify(args), false);
-};
-
-PhoneGap.execAsync = function(success, fail, clazz, action, args) {
-	var callbackId = clazz + PhoneGap.callbackId++;
-	PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
-	return CommandManager.exec(clazz, action, callbackId, JSON.stringify(args), true);
-};
-
-PhoneGap.execWatch = function(success, fail, clazz, action, args) {
-	var callbackId = clazz + PhoneGap.callbackId++;
+PhoneGap.exec = function(success, fail, clazz, action, args, async) {
+    var callbackId = clazz + PhoneGap.callbackId++;
 	PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
 	return CommandManager.exec(clazz, action, callbackId, JSON.stringify(args), true);
 };
@@ -217,6 +209,40 @@ PhoneGap.callbackError = function(callbackId, args) {
 	delete PhoneGap.callbacks[callbackId];
 };
 
+
+/* Executing watches is a bit different */
+
+
+PhoneGap.execWatch = function(success, fail, clazz, action, args) {
+	var watchId = PhoneGap.watchId++;
+	if (typeof PhoneGap.callbacksWatch[clazz] === 'undefined') {
+	    PhoneGap.callbacksWatch[clazz] = {};
+	}
+	PhoneGap.callbacksWatch[clazz][watchId] = {success:success, fail:fail};
+	return CommandManager.execWatch(clazz, action, watchId, JSON.stringify(args), true);
+};
+
+PhoneGap.clearWatch = function(clazz, watchId) {
+    // remove the handler from the watch list for the specified clazz
+    var noWatches = true, clazzWatches = PhoneGap.callbacksWatch[clazz];
+    delete clazzWatches[watchId];
+    // Check if any more watches exist for this clazz
+    for (var item in clazzWatches) {
+        noWatches = false;
+        break;
+    }
+    // If no watches exist then stop this guy
+    if (noWatches) {
+        PhoneGap.execWatchStop(clazz, 'stop');
+    }
+};
+
+PhoneGap.callbackWatchSuccess = function(clazz, args) {
+    var watches = PhoneGap.callbacksWatch[clazz];
+    for (var watchId in watches) {
+        watches[watchId].success(args);
+    }
+};
 
 /**
  * Internal function used to dispatch the request to PhoneGap.  It processes the
