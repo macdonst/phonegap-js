@@ -3,9 +3,7 @@ function Geolocation() {
 };
 
 Geolocation.prototype.getCurrentPosition = function(successCallback, errorCallback, options) {
-    PhoneGap.execAsync(function(args) {
-        this.m_gotPosition(args, successCallback);
-    }, errorCallback, 'com.phonegap.Geolocation', 'getCurrentPosition');
+    PhoneGap.execAsync(PhoneGap.close(this, this.m_gotPosition, [successCallback]), errorCallback, 'com.phonegap.Geolocation', 'getCurrentPosition');
 };
 
 Geolocation.prototype.watchPosition = function(successCallback, errorCallback, options) {

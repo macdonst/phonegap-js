@@ -1,0 +1,1 @@
+PhoneGap.addConstructor('splashScreen', SplashScreen);  // SplashScreen object come from native side through addJavaScriptInterface
