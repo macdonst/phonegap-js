@@ -8,6 +8,8 @@
 	<script type="text/javascript" src="qunit.js"></script>
 	<!-- Make sure you copy in phonegap.js from the PhoneGap repository (that's what you're testing, right?) -->
     <script type="text/javascript" src="../src/android/phonegap.js"></script>
+    <script type="text/javascript" src="../src/geolocation.js"></script>
+    <script type="text/javascript" src="../src/position.js"></script>
 	<script type="text/javascript">
 		PhoneGap.desktop = true;
 		
@@ -27,7 +29,7 @@
 
 		document.addEventListener('deviceready', run, false);
 	</script>
-	<script type="text/javascript" src="tests/phonegap.test.js"></script>
+	<script type="text/javascript" src="tests/geolocation.test.js"></script>
   </head>
 	<body>
 		<h1 id="qunit-header">Mobile Spec (PhoneGap) Tests</h1>

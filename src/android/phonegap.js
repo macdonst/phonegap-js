@@ -4,14 +4,14 @@
  * @class
  */
 var PhoneGap = { };
+var phonegap = { };
 
 PhoneGap.desktop = false;
 
 /**
  * Custom pub-sub channel that can have functions subscribed to it
  */
-PhoneGap.Channel = function(type)
-{
+PhoneGap.Channel = function(type) {
     this.type = type;
     this.handlers = {};
     this.guid = 0;
@@ -123,6 +123,12 @@ PhoneGap.addConstructor = function(func) {
     });
 };
 
+PhoneGap.addExtension = function(name, obj) {
+    if (typeof phonegap[name] == 'undefined') {
+        phonegap[name] = obj;
+    }
+}
+
 /**
  * Adds a plugin object to window.plugins
  */
@@ -177,6 +183,7 @@ document.addEventListener = function(evt, handler, capture) {
     if (evt.toLowerCase() == 'deviceready') {
         if (PhoneGap.desktop) {
             window.onload = handler;
+            PhoneGap.onDeviceReady.fire();
         } else {
             PhoneGap.onDeviceReady.subscribeOnce(handler);
         }
@@ -264,51 +271,6 @@ PhoneGap.callbackWatchSuccess = function(clazz, args) {
     }
 };
 
-/**
- * Internal function used to dispatch the request to PhoneGap.  It processes the
- * command queue and executes the next command on the list.  If one of the
- * arguments is a JavaScript object, it will be passed on the QueryString of the
- * url, which will be turned into a dictionary on the other end.
- * @private
- */
-PhoneGap.run_command = function() {
-    if (!PhoneGap.available || !PhoneGap.queue.ready)
-        return;
-
-    PhoneGap.queue.ready = false;
-
-    var args = PhoneGap.queue.commands.shift();
-    if (PhoneGap.queue.commands.length == 0) {
-        clearInterval(PhoneGap.queue.timer);
-        PhoneGap.queue.timer = null;
-    }
-
-    var uri = [];
-    var dict = null;
-    for (var i = 1; i < args.length; i++) {
-        var arg = args[i];
-        if (arg == undefined || arg == null)
-            arg = '';
-        if (typeof(arg) == 'object')
-            dict = arg;
-        else
-            uri.push(encodeURIComponent(arg));
-    }
-    var url = "gap://" + args[0] + "/" + uri.join("/");
-    if (dict != null) {
-        var query_args = [];
-        for (var name in dict) {
-            if (typeof(name) != 'string')
-                continue;
-            query_args.push(encodeURIComponent(name) + "=" + encodeURIComponent(dict[name]));
-        }
-        if (query_args.length > 0)
-            url += "?" + query_args.join("&");
-    }
-    document.location = url;
-
-};
-
 PhoneGap.close = function(context, func, params) {
     if (typeof params === 'undefined') {
         return function() {
@@ -317,7 +279,7 @@ PhoneGap.close = function(context, func, params) {
     } else {
         return function() {
 			var args = Array.prototype.slice.call(arguments);
-            return func.apply(context, args.concat(params));
+            return func.apply(context, params.concat(args));
         }
     }
 };

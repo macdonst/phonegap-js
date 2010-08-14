@@ -10,8 +10,8 @@
  * @constructor
  */
 function Position(coords, timestamp) {
-	this.coords = coords;
-        this.timestamp = new Date().getTime();
+    this.coords = coords;
+    this.timestamp = new Date().getTime();
 }
 
 function Coordinates(lat, lng, alt, acc, head, vel) {

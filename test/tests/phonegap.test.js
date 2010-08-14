@@ -110,13 +110,11 @@ Tests.prototype.PhoneGapTests = function() {
 		equal(typeof PhoneGap.execWatch, 'function', 'PhoneGap.execWatch should be a function.');
 
         // Android
-    	CommandManager = {
-    	    execWatch: function(clazz, action, watchId, jsonArgsString, async) {
-    	        if (async) {
-    	            PhoneGap.callbackWatchSuccess(clazz, 'callbackArgs');
-    	        }
-            }
-    	}
+    	CommandManager.execWatch = function(clazz, action, watchId, jsonArgsString, async) {
+    	    if (async) {
+    	        PhoneGap.callbackWatchSuccess(clazz, 'callbackArgs');
+    	    }
+        };
 
     	// iPhone - this is how we can hook into the gap://foo/bar calls
         document.__defineSetter__("location", function (val) {
