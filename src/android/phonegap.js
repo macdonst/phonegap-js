@@ -102,7 +102,7 @@ PhoneGap.Channel.join = function(h, c) {
         (!c[j].fired?c[j].subscribeOnce(f):i--);
     }
     if (!i) h();
-}
+};
 
 /**
  * Add an initialization function to a queue that ensures it will run and initialize
@@ -127,7 +127,7 @@ PhoneGap.addExtension = function(name, obj) {
     if (typeof phonegap[name] == 'undefined') {
         phonegap[name] = obj;
     }
-}
+};
 
 /**
  * Adds a plugin object to window.plugins
@@ -136,11 +136,10 @@ PhoneGap.addPlugin = function(name, obj) {
 	if ( !window.plugins ) {
 		window.plugins = {};
 	}
-
 	if ( !window.plugins[name] ) {
 		window.plugins[name] = obj;
 	}
-}
+};
 
 /**
  * onDOMContentLoaded channel is fired when the DOM content 
@@ -227,12 +226,16 @@ PhoneGap.exec = function(success, fail, clazz, action, args, async) {
 
 PhoneGap.callbackSuccess = function(callbackId, args) {
 	PhoneGap.callbacks[callbackId].success(args);
-	delete PhoneGap.callbacks[callbackId];
+	PhoneGap.clearExec(callbackId);
 };
 
 PhoneGap.callbackError = function(callbackId, args) {
 	PhoneGap.callbacks[callbackId].fail(args);
-	delete PhoneGap.callbacks[callbackId];
+	PhoneGap.clearExec(callbackId);
+};
+
+PhoneGap.clearExec = function(callbackId) {
+    delete PhoneGap.callbacks[callbackId];
 };
 
 

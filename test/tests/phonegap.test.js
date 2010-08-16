@@ -17,9 +17,8 @@ Tests.prototype.PhoneGapTests = function() {
 		equal(typeof PhoneGap.callbacks, 'object', 'PhoneGap.callbacks should be an object.');
 	});
 	test('should contain a callbackId number', function() {
-		expect(2);
+		expect(1);
 		equal(typeof PhoneGap.callbackId, 'number', 'PhoneGap.callbackId should be a number.');
-		equal(PhoneGap.callbackId, 0, 'PhoneGap.callbackId should initially be 0.');
 	});
 	test('should contain an addConstructor function', function() {
 		expect(1);

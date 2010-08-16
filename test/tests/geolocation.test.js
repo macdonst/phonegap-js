@@ -2,7 +2,13 @@ Tests.prototype.GeolocationTests = function() {
 	module('Geolocation');
 	test('should exist', function() {
   		expect(1);
-  		equal(typeof phonegap.geolocation, 'object', 'phonegap.geolocation should not be null.');
+  		equal(typeof phonegap.geolocation, 'object', 'phonegap.geolocation should be an object.');
+	});
+	test('should define constants for GPS status', function() {
+  		expect(3);
+  		equal(typeof Geolocation.status, 'object', 'Geolocation.status should be an object.');
+  		equal(Geolocation.status.RUNNING, 0, 'Geolocation.status.RUNNING should be 0.');
+  		equal(Geolocation.status.STOPPED, 1, 'Geolocation.status.STOPPED should be 1.');
 	});
 	test('should contain a getCurrentPosition function', function() {
   		expect(1);

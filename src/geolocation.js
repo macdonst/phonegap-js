@@ -1,3 +1,5 @@
+// http://dev.w3.org/geo/api/spec-source.html
+
 function Geolocation() {
     this.lastPosition = null;
     this.watchList = {};
@@ -10,20 +12,31 @@ Geolocation.status = {
 };
 
 Geolocation.prototype.getCurrentPosition = function(successCallback, errorCallback, options) {
-    var self = this;
-    PhoneGap.exec(function(args) {
-            self.m_gotPosition(successCallback, args)
-        }, errorCallback, 'com.phonegap.Geolocation', 'getCurrentPosition');
+    options = options || new PositionOptions();
+    if (typeof successCallback != 'function') { return; }
+    if (this.m_returnCached(options)) {
+        successCallback(this.lastPosition);
+    } else if (options.timeout <= 0)
+        errorCallback(new PositionError(PositionError.TIMEOUT));
+    } else {
+        var self = this;
+        var callbackId = PhoneGap.exec(function(args) {
+                self.m_gotPosition(successCallback, args)
+            }, errorCallback, 'com.phonegap.Geolocation', 'getCurrentPosition', options);
+        setTimeout(function() { 
+                self.m_timeoutPosition(errorCallback, callbackId);
+            }, options.timeout);
+        return callbackId;
+    }
 };
 
 Geolocation.prototype.watchPosition = function(successCallback, errorCallback, options) {
-    if (typeof options == 'undefined') {
-        options = {};
+    options = options || new PositionOptions();
+
+    if (this.m_returnCached(options)) {
+        successCallback(this.lastPosition);
     }
-    if (typeof options.frequency != 'number') {
-        options.frequency = 10000;
-    }
-    
+
     var watchId = this.lastWatchId++;
 
     // Check if the GPS is already running
@@ -60,8 +73,20 @@ Geolocation.prototype.m_setupWatch = function(successCallback, errorCallback, op
 };
 
 Geolocation.prototype.m_gotPosition = function(callback, args) {
-    this.lastPosition = new Position(new Coordinates(args.lat, args.lng, args.alt, args.altacc, args.head, args.vel), new Date().valueOf());
+    this.lastPosition = new Position(new Coordinates(args.lat, args.lng, args.alt, args.altacc, args.head, args.vel));
     callback(this.lastPosition);
+};
+
+Geolocation.prototype.m_timeoutPosition = function(callback, callbackId) {
+    PhoneGap.clearCallback(callbackId);
+    callback(new PositionError(PositionError.TIMEOUT));
+};
+
+/**
+ * Checks if the lastPosition is recent enough to return.
+ */
+Geolocation.prototype.m_returnCached = function(options) {
+    return (this.lastPosition != null && options.maximumAge > (new Date().valueOf() - this.lastPosition.timestamp));
 };
 
 PhoneGap.addConstructor(function() { PhoneGap.addExtension('geolocation', new Geolocation()); });

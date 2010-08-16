@@ -11,7 +11,7 @@
  */
 function Position(coords, timestamp) {
     this.coords = coords;
-    this.timestamp = new Date().getTime();
+    this.timestamp = timestamp || new Date().valueOf();
 }
 
 function Coordinates(lat, lng, alt, acc, head, vel) {
@@ -45,25 +45,34 @@ function Coordinates(lat, lng, alt, acc, head, vel) {
  * This class specifies the options for requesting position data.
  * @constructor
  */
-function PositionOptions() {
+function PositionOptions(highAccuracy, timeout, maxAge, minAccuracy) {
 	/**
 	 * Specifies the desired position accuracy.
 	 */
-	this.enableHighAccuracy = true;
+	this.enableHighAccuracy = highAccuracy || false;
 	/**
 	 * The timeout after which if position data cannot be obtained the errorCallback
 	 * is called.
 	 */
-	this.timeout = 10000;
+	this.timeout = timeout || 10000;
+	/**
+	 * The maximum age in milliseconds of a cached position. If 0 then a cached position
+	 * will never be used.
+	 */
+	this.maximumAge = maxAge || 0;
+	/**
+	 * PhoneGap specific option to force the GPS to wait until a desired level of accuracy is achieved.
+	 */
+	this.minimumAccuracy = minAccuracy || 1000000;
 }
 
 /**
  * This class contains information about any GSP errors.
  * @constructor
  */
-function PositionError() {
-	this.code = null;
-	this.message = "";
+function PositionError(code, message) {
+	this.code = code || PositionError.UNKNOWN_ERROR;
+	this.message = message || '';
 }
 
 PositionError.UNKNOWN_ERROR = 0;

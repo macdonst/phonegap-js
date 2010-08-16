@@ -8,6 +8,11 @@
 	<script type="text/javascript" src="qunit.js"></script>
 	<!-- Make sure you copy in phonegap.js from the PhoneGap repository (that's what you're testing, right?) -->
     <script type="text/javascript" src="../src/android/phonegap.js"></script>
+    <!--<script type="text/javascript" src="../src/device.js"></script>-->
+    <script type="text/javascript" src="../src/notification.js"></script>
+    <script type="text/javascript" src="../src/network.js"></script>
+    <script type="text/javascript" src="../src/camera.js"></script>
+    <script type="text/javascript" src="../src/accelerometer.js"></script>
     <script type="text/javascript" src="../src/geolocation.js"></script>
     <script type="text/javascript" src="../src/position.js"></script>
 	<script type="text/javascript">
@@ -29,7 +34,13 @@
 
 		document.addEventListener('deviceready', run, false);
 	</script>
+	<script type="text/javascript" src="tests/device.test.js"></script>
+	<script type="text/javascript" src="tests/notification.test.js"></script>
+	<script type="text/javascript" src="tests/network.test.js"></script>
+	<script type="text/javascript" src="tests/camera.test.js"></script>
+	<script type="text/javascript" src="tests/accelerometer.test.js"></script>
 	<script type="text/javascript" src="tests/geolocation.test.js"></script>
+	<script type="text/javascript" src="tests/phonegap.test.js"></script>
   </head>
 	<body>
 		<h1 id="qunit-header">Mobile Spec (PhoneGap) Tests</h1>

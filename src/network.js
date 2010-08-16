@@ -1,3 +1,6 @@
+
+// http://www.w3.org/TR/2010/WD-system-info-api-20100202/#network
+
 /**
  * This class contains information about any NetworkStatus.
  * @constructor
@@ -9,6 +12,7 @@ function NetworkStatus() {
 NetworkStatus.NOT_REACHABLE = 0;
 NetworkStatus.REACHABLE_VIA_CARRIER_DATA_NETWORK = 1;
 NetworkStatus.REACHABLE_VIA_WIFI_NETWORK = 2;
+
 /**
  * This class provides access to device Network data (reachability).
  * @constructor
@@ -21,11 +25,12 @@ function Network() {
      */
 	this.lastReachability = null;
 };
+
 /**
  * Called by the geolocation framework when the reachability status has changed.
  * @param {Reachibility} reachability The current reachability status.
  */
-Network.prototype.m_gotReachability = function(args, callback) {
+Network.prototype.m_gotReachability = function(callback, args) {
     // args should be of type NetworkStatus
     this.lastReachability = args;
     callback(this.lastReachability);
@@ -38,6 +43,10 @@ Network.prototype.m_gotReachability = function(args, callback) {
  * @param {Object} options  (isIpAddress:boolean)
  */
 Network.prototype.isReachable = function(uri, win, options) {
-    PhoneGap.exec(PhoneGap.close(this, this.m_gotReachability), function() {}, 'com.phonegap.Network', 'isReachable');
+    var self = this;
+    PhoneGap.exec(function(args) {
+            self.m_gotReachability(win, args);
+        }, function() {}, 'com.phonegap.Network', 'isReachable', options);
 };
-PhoneGap.addConstructor('network', new Network());
+
+PhoneGap.addConstructor(function() { PhoneGap.addExtension('network', new Network()); });
