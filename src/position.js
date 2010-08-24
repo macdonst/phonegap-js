@@ -18,27 +18,27 @@ function Coordinates(lat, lng, alt, acc, head, vel) {
 	/**
 	 * The latitude of the position.
 	 */
-	this.latitude = lat;
+	this.latitude = lat || 0;
 	/**
 	 * The longitude of the position,
 	 */
-	this.longitude = lng;
+	this.longitude = lng || 0;
 	/**
 	 * The accuracy of the position.
 	 */
-	this.accuracy = acc;
+	this.accuracy = acc || 0;
 	/**
 	 * The altitude of the position.
 	 */
-	this.altitude = alt;
+	this.altitude = alt || 0;
 	/**
 	 * The direction the device is moving at the position.
 	 */
-	this.heading = head;
+	this.heading = head || 0;
 	/**
 	 * The velocity with which the device is moving at the position.
 	 */
-	this.speed = vel;
+	this.speed = vel || 0;
 }
 
 /**
@@ -54,7 +54,7 @@ function PositionOptions(highAccuracy, timeout, maxAge, minAccuracy) {
 	 * The timeout after which if position data cannot be obtained the errorCallback
 	 * is called.
 	 */
-	this.timeout = timeout || 10000;
+	this.timeout = timeout || 10000000;
 	/**
 	 * The maximum age in milliseconds of a cached position. If 0 then a cached position
 	 * will never be used.
@@ -63,7 +63,18 @@ function PositionOptions(highAccuracy, timeout, maxAge, minAccuracy) {
 	/**
 	 * PhoneGap specific option to force the GPS to wait until a desired level of accuracy is achieved.
 	 */
-	this.minimumAccuracy = minAccuracy || 1000000;
+	this.minimumAccuracy = minAccuracy || 10000000;
+	
+	// iOS 2+ http://developer.apple.com/iphone/library/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html
+	// distanceFilter
+	// desiredAccuracy
+	// Android 1+ http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(java.lang.String, long, float, android.location.LocationListener)
+	// minTime
+	// minDistance
+	// BlackBerry 4+ http://www.blackberry.com/developers/docs/4.0.2api/javax/microedition/location/LocationProvider.html
+	// interval
+	// timeout
+	// maxAge
 }
 
 /**

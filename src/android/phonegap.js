@@ -218,10 +218,10 @@ PhoneGap.callbacksWatch = {};
  * Exec is always async since not all platforms can get back immediate return values.
  * This will return a value on platforms that support it.
  */
-PhoneGap.exec = function(success, fail, clazz, action, args, async) {
+PhoneGap.exec = function(success, fail, clazz, action, args) {
     var callbackId = clazz + PhoneGap.callbackId++;
 	PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
-	return CommandManager.exec(clazz, action, callbackId, JSON.stringify(args), true);
+	return CommandManager.exec(clazz, action, callbackId, JSON.stringify(args));
 };
 
 PhoneGap.callbackSuccess = function(callbackId, args) {
@@ -239,39 +239,33 @@ PhoneGap.clearExec = function(callbackId) {
 };
 
 
+PhoneGap.execSync = function(clazz, action, args) {
+	return CommandManager.exec(clazz, action, null, JSON.stringify(args));
+};
+
 /* Executing watches is a bit different */
 
 
 PhoneGap.execWatch = function(success, fail, clazz, action, args) {
 	var watchId = PhoneGap.watchId++;
-	if (typeof PhoneGap.callbacksWatch[clazz] === 'undefined') {
-	    PhoneGap.callbacksWatch[clazz] = {};
+	PhoneGap.callbacksWatch[watchId] = {success:success, fail:fail};
+	var error = CommandManager.execWatch(clazz, action, watchId, JSON.stringify(args));
+	if (error != '0') {
+	    throw error;
 	}
-	PhoneGap.callbacksWatch[clazz][watchId] = {success:success, fail:fail};
-	return CommandManager.execWatch(clazz, action, watchId, JSON.stringify(args), true);
+	return watchId;
 };
 
 PhoneGap.clearWatch = function(clazz, watchId) {
-    // remove the handler from the watch list for the specified clazz
-    var noWatches = true, clazzWatches = PhoneGap.callbacksWatch[clazz];
-    delete clazzWatches[watchId];
-    // Check if any more watches exist for this clazz
-    for (var item in clazzWatches) {
-        noWatches = false;
-        break;
-    }
-    // If no watches exist then stop this guy
-    if (noWatches) {
-        delete PhoneGap.callbacksWatch[clazz];
-        CommandManager.execStopWatch(clazz, 'stop');
+    delete PhoneGap.callbacksWatch[watchId];
+    var error = CommandManager.exec(clazz, 'clearWatch', null, JSON.stringify( { watchId: watchId } ) );
+    if (error != '0') {
+        throw error;
     }
 };
 
-PhoneGap.callbackWatchSuccess = function(clazz, args) {
-    var watches = PhoneGap.callbacksWatch[clazz];
-    for (var watchId in watches) {
-        watches[watchId].success(args);
-    }
+PhoneGap.callbackWatchSuccess = function(watchId, args) {
+    PhoneGap.callbacksWatch[watchId].success(args);
 };
 
 PhoneGap.close = function(context, func, params) {

@@ -1,69 +1,115 @@
-var Contact = function() {
-  this.name = new ContactName();
-  this.emails = [];
-  this.phones = [];
-}
+// http://www.w3.org/TR/contacts-api/
 
-var ContactName = function() {
-  this.formatted = "";
-  this.familyName = "";
-  this.givenName = "";
-  this.additionalNames = [];
-  this.prefixes = [];
-  this.suffixes = [];
-}
+var Contact = function(id, displayName, name, nickname, phoneNumbers, emails, addresses,
+    ims, organizations, published, updated, birthday, anniversary, gender, note, 
+    preferredUsername, photos, tags, relationships, urls, accounts, utcOffset, connected) {
+    this.id = '';
+    this.displayName = '';
+    this.name = null; // ContactName
+    this.nickname = '';
+    this.poneNumbers = null; // ContactField[]
+    this.emails = null; // ContactField[]
+    this.addresses = null; // ContactAddress[]
+    this.ims = null; // ContactField[]
+    this.organizations = null; // ContactOrganization[]
+    this.published = '';
+    this.updated = '';
+    this.birthday = '';
+    this.anniversary = '';
+    this.gender = '';
+    this.note = '';
+    this.preferredUsername = '';
+    this.photos = null; // ContactField[]
+    this.tags = null; // ContactField[]
+    this.relationships = null; // ContactField[]
+    this.urls = null; // ContactField[]
+    this.accounts = null; // ContactAccount[]
+    this.utcOffset = '';
+    this.connected = '';
+};
 
+var ContactName = function(formatted, familyName, givenName, middle, prefix, suffix) {
+    this.formatted = formatted || '';
+    this.familyName = familyName || '';
+    this.givenName = givenName || '';
+    this.middleName = middle || '';
+    this.honorificPrefix = prefix || '';
+    this.honorificSuffix = suffix || '';
+};
 
-var ContactEmail = function() {
-  this.types = [];
-  this.address = "";
-}
+var ContactField = function(type, value, primary) {
+    this.type = type || '';
+    this.value = value || '';
+    this.primary = primary || '';
+};
 
-var ContactPhoneNumber = function() {
-  this.types = [];
-  this.number = "";
-}
+var ContactAddress = function() {
+    this.formatted = formatted || '';
+    this.streetAddress = streetAddress || '';
+    this.locality = locality || '';
+    this.region = region || '';
+    this.postalCode = postalCode || '';
+    this.country = country || '';
+};
+
+var ContactOrganization = function(name, dept, title, startDate, endDate, location, desc) {
+    this.name = name || '';
+    this.department = dept || '';
+    this.title = title || '';
+    this.startDate = startDate || '';
+    this.endDate = endDate || '';
+    this.location = location || '';
+    this.description = desc || '';
+};
 
 
 var Contacts = function() {
-  this.records = [];  
+    this.inProgress = false;
 }
 
-Contacts.prototype.find = function(obj, win, fail) {
-    if(obj.name != null) {
-	// Build up the search term that we'll use in SQL, based on the structure/contents of the contact object passed into find.
-	   var searchTerm = '';
-	   if (obj.name.givenName && obj.name.givenName.length > 0) {
-			searchTerm = obj.name.givenName.split(' ').join('%');
-	   }
-	   if (obj.name.familyName && obj.name.familyName.length > 0) {
-			searchTerm += obj.name.familyName.split(' ').join('%');
-	   }
-	   if (!obj.name.familyName && !obj.name.givenName && obj.name.formatted) {
-			searchTerm = obj.name.formatted;
-	   }
-	   PhoneGap.execAsync(PhoneGap.close(this, this.m_foundContact, [win]), fail, 'com.phonegap.Contacts', 'find', [searchTerm]);
-  }
-}
+Contacts.prototype.find = function(fields, win, fail, options) {
+    this.inProgress = true;
+    var self = this;
+    PhoneGap.exec(function(contacts) {
+            self.m_foundContacts(win, contacts);
+        }, fail, 'com.phonegap.Contacts', 'find', [fields, options]);
+};
 
-Contacts.prototype.m_foundContact = function(args, callback) {
-  var contact = new Contact();
-  contact.name = new ContactName();
-  contact.name.formatted = args.name;
-  contact.name.givenName = args.name;
-  var mail = new ContactEmail();
-  mail.types.push("home");
-  mail.address = args.email;
-  contact.emails.push(mail);
-  phone = new ContactPhoneNumber();
-  phone.types.push("home");
-  phone.number = args.npa;
-  contact.phones.push(phone);
-  //this.records.push(contact);
-}
+Contacts.prototype.remove = function(contact) {
+    
+};
 
-Contacts.prototype.droidDone = function() {
-  this.win(this.records);
-}
+Contacts.prototype.save = function(contact) {
+    
+};
+
+Contacts.prototype.create = function(contact) {
+    
+};
+
+Contacts.prototype.m_foundContacts = function(win, contacts) {
+    this.inProgress = false;
+    win(contacts);
+};
+
+
+var ContactFindOptions = function() {
+    this.filter = '';
+    this.multiple = true;
+    this.limit = 0;
+    this.updatedSince = 0;
+};
+
+var ContactError = function() {
+};
+
+ContactError.INVALID_ARGUMENT_ERROR = 0;
+ContactError.IO_ERROR = 1;
+ContactError.NOT_FOUND_ERROR = 2;
+ContactError.NOT_SUPPORTED_ERROR = 3;
+ContactError.PENDING_OPERATION_ERROR = 4;
+ContactError.PERMISSION_DENIED_ERROR = 5;
+ContactError.TIMEOUT_ERROR = 6;
+ContactError.UNKNOWN_ERROR = 7;
 
 PhoneGap.addConstructor('contacts', new Contacts());

@@ -1,3 +1,14 @@
+/*
+window.addEventListener("devicemotion", function(event) {
+           // Process event.acceleration, event.accelerationIncludingGravity,
+           // event.rotationRate and event.interval
+       }, true);
+
+ - only once something is looking for devicemotion do we start the accelerometer
+ - once no more listeners are attached we stop the accelerometer
+*/
+
+
 function Acceleration(x, y, z)
 {
   this.x = x;
@@ -15,14 +26,7 @@ function Accelerometer() {
 	 * The last known acceleration.
 	 */
 	this.lastAcceleration = null;
-	this.watchList = {};
-    this.lastWatchId = 0;
 }
-
-Accelerometer.status = {
-    RUNNING: 0,
-    STOPPED: 1
-};
 
 /**
  * Asynchronously aquires the current acceleration.
@@ -35,14 +39,9 @@ Accelerometer.status = {
  */
 Accelerometer.prototype.getCurrentAcceleration = function(successCallback, errorCallback, options) {
     var self = this;
-    PhoneGap.exec(function(args) {
+    return PhoneGap.exec(function(args) {
             self.m_gotAcceleration(successCallback, args);
         }, errorCallback, 'com.phonegap.Accelerometer', 'getCurrentAcceleration');
-};
-
-Accelerometer.prototype.m_setupWatch = function(successCallback, errorCallback, options, watchId, args) {
-    var x = setInterval(PhoneGap.close(this, this.getCurrentAcceleration, [successCallback, errorCallback, options]), options.frequency);
-    this.watchList[watchId] = x;
 };
 
 Accelerometer.prototype.m_gotAcceleration = function(callback, args) {
@@ -67,19 +66,11 @@ Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallb
     if (typeof options.frequency != 'number') {
         options.frequency = 10000;
     }
-    
-    var watchId = this.lastWatchId++;
 
-    // Check if the GPS is already running
-    PhoneGap.exec(PhoneGap.close(this, function(args) { // Success
-        if (args.status == Accelerometer.status.RUNNING) {
-            this.m_setupWatch(successCallback, errorCallback, options, watchId);
-        } else {
-            // Start it - on successful start then call m_doWatch to setup the interval
-            PhoneGap.exec(PhoneGap.close(this, this.m_setupWatch, [successCallback, errorCallback, options, watchId]), errorCallback, 'com.phonegap.Accelerometer', 'start');
-        }
-    }), errorCallback, 'com.phonegap.Accelerometer', 'status');
-    
+    var self = this;
+    var watchId = PhoneGap.exec(function(args) {
+            self.m_gotAcceleration(successCallback, args);
+        }, errorCallback, 'com.phonegap.Accelerometer', 'watchAcceleration');
     return watchId;
 };
 
@@ -88,18 +79,7 @@ Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallb
  * @param {String} watchId The ID of the watch returned from #watchAcceleration.
  */
 Accelerometer.prototype.clearWatch = function(watchId) {
-    clearInterval(this.watchList[watchId]);
-    delete this.watchList[watchId];
-    var empty = true;
-    for (var item in this.watchList) {
-        if (this.watchList.hasOwnProperty(item)) {
-            emtpy = false;
-            break;
-        }
-    }
-    if (empty) {
-        PhoneGap.exec(function() {}, function() {}, 'com.phonegap.Accelerometer', 'stop')
-    }
+    PhoneGap.clearWatch('com.phonegap.Accelerometer', watchId);
 };
 
 PhoneGap.addConstructor(function() { PhoneGap.addExtension('accelerometer', new Accelerometer()); });

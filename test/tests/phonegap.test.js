@@ -67,10 +67,8 @@ Tests.prototype.PhoneGapTests = function() {
 
         // Android
     	CommandManager = {
-    	    exec: function(clazz, action, callbackId, jsonArgsString, async) {
-    	        if (async) {
-    	            PhoneGap.callbackSuccess(callbackId, 'callbackArgs');
-    	        }
+    	    exec: function(clazz, action, callbackId, jsonArgsString) {
+	            PhoneGap.callbackSuccess(callbackId, 'callbackArgs');
             }
     	}
 
@@ -80,6 +78,7 @@ Tests.prototype.PhoneGapTests = function() {
         });
         
         // BlackBerry etc ...
+        //
 
     	var clazz = 'com.phonegap.foo';
     	var callbackId = clazz + PhoneGap.callbackId;
@@ -91,8 +90,9 @@ Tests.prototype.PhoneGapTests = function() {
             equal(args, 'callbackArgs', 'success callback should be passed some args from the CommandManager');
             start();
         }, function fail() {
+            ok(false, 'in the fail callback');
             start();
-        }, 'com.phonegap.foo', 'bar', ['baz'], true);
+        }, 'com.phonegap.foo', 'bar', ['baz']);
 
         //PhoneGap.exec(function() {}, function() {}, 'com.phonegap.foo', 'bar');
 	});

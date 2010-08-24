@@ -1,3 +1,12 @@
+/*
+window.addEventListener("deviceorientation", function(event) {
+            // process event.alpha, event.beta and event.gamma
+        }, true);
+
+ - only once something is looking for deviceorientation do we start the compass
+ - once no more listeners are attached we stop the compass
+*/
+
 /**
  * This class provides access to device Compass data.
  * @constructor
@@ -19,7 +28,10 @@ function Compass() {
  * such as timeout.
  */
 Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, options) {
-	PhoneGap.execAsync(PhoneGap.close(this, this.m_gotHeading, [successCallback]), errorCallback, 'com.phonegap.Compass', 'getCurrentHeading');
+    var self = this;
+	PhoneGap.exec(function() {
+	        self.m_gotHeading(successCallback);
+	    }, errorCallback, 'com.phonegap.Compass', 'getCurrentHeading');
 };
 
 /**

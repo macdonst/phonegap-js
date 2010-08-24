@@ -1,10 +1,7 @@
 /**
  * This class provides access to notifications on the device.
  */
-function Notification() 
-{
-
-}
+function Notification() { }
 
 /**
  * Causes the device to blink a status LED.
@@ -12,15 +9,15 @@ function Notification()
  * @param {String} colour The colour of the light.
  */
 Notification.prototype.blink = function(count, colour) {
-
+	return PhoneGap.execSync('com.phonegap.Notification', 'blink', [count, colour]);
 };
 
 Notification.prototype.vibrate = function(mills) {
-	PhoneGap.exec('com.phonegap.notification', 'vibrate');
+	return PhoneGap.execSync('com.phonegap.Notification', 'vibrate', [mills]);
 };
 
 Notification.prototype.beep = function(count, volume) {
-	PhoneGap.exec('com.phonegap.notification', 'beep');
+	return PhoneGap.execSync('com.phonegap.Notification', 'beep', [count, volume]);
 };
 
 /**
@@ -29,20 +26,9 @@ Notification.prototype.beep = function(count, volume) {
  * @param {String} [title="Alert"] Title of the alert dialog (default: Alert)
  * @param {String} [buttonLabel="OK"] Label of the close button (default: OK)
  */
-Notification.prototype.alert = function(message, title, buttonLabel) 
-{
-	var options = {};
-
-	if (title) 
-		options.title = title;
-	if (buttonLabel) 
-		options.buttonLabel = buttonLabel;
-
-	PhoneGap.exec('Notification.alert', message, options);
-	this._alertDelegate = {};
-	return this._alertDelegate;
+Notification.prototype.alert = function(successCallback, errorCallback, message, title, buttonLabel) {
+	return PhoneGap.exec(successCallback, errorCallback, 'com.phonegap.Notification', alert, [message, title, buttonLabel]);
 };
-
 
 /**
  * Open a native alert dialog, with a customizable title and button text.
@@ -59,7 +45,7 @@ Notification.prototype.confirm = function(message, title, buttonLabels)
 	return this.alert(message, title, labels);
 };
 
-Notification.prototype._alertCallback = function(index,label) {
+Notification.prototype.m_alertCallback = function(index,label) {
 	this._alertDelegate.onAlertDismissed(index,label);
 };
 

@@ -33,3 +33,36 @@ interface FileReader {
 FileReader implements EventTarget;
 
 */
+
+function FileReader() {
+    this.result = '';
+    this.error = null;
+    this.onloadstart;
+    this.onprogress;
+    this.onload;
+    this.onabort;
+    this.onerror;
+    this.onloadend;
+}
+
+FileReady.prototype = EventTarget.prototype;
+
+FileReader.EMPTY = 0;
+FileReader.LOADING = 1;
+FileReader.DONE = 2;
+
+FileReader.prototype.readAsBinaryString = function(fileBlob) {
+    
+};
+
+FileReader.prototype.reasAsText = function(fileBlob) {
+    
+};
+
+FileReader.prototype.readAsDataUrl = function(fileBlob) {
+    
+};
+
+FileReader.prototype.abort = function(fileBlob) {
+    
+};
