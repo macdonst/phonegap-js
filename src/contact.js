@@ -1,31 +1,31 @@
 // http://www.w3.org/TR/contacts-api/
 
 var Contact = function(id, displayName, name, nickname, phoneNumbers, emails, addresses,
-    ims, organizations, published, updated, birthday, anniversary, gender, note, 
+    ims, organizations, published, updated, birthday, anniversary, gender, note,
     preferredUsername, photos, tags, relationships, urls, accounts, utcOffset, connected) {
-    this.id = '';
-    this.displayName = '';
-    this.name = null; // ContactName
-    this.nickname = '';
-    this.poneNumbers = null; // ContactField[]
-    this.emails = null; // ContactField[]
-    this.addresses = null; // ContactAddress[]
-    this.ims = null; // ContactField[]
-    this.organizations = null; // ContactOrganization[]
-    this.published = '';
-    this.updated = '';
-    this.birthday = '';
-    this.anniversary = '';
-    this.gender = '';
-    this.note = '';
-    this.preferredUsername = '';
-    this.photos = null; // ContactField[]
-    this.tags = null; // ContactField[]
-    this.relationships = null; // ContactField[]
-    this.urls = null; // ContactField[]
-    this.accounts = null; // ContactAccount[]
-    this.utcOffset = '';
-    this.connected = '';
+    this.id = id || '';
+    this.displayName = displayName || '';
+    this.name = name || null; // ContactName
+    this.nickname = nickname || '';
+    this.phoneNumbers = phoneNumbers || null; // ContactField[]
+    this.emails = emails || null; // ContactField[]
+    this.addresses = addresses || null; // ContactAddress[]
+    this.ims = ims || null; // ContactField[]
+    this.organizations = organizations || null; // ContactOrganization[]
+    this.published = published || '';
+    this.updated = updated || '';
+    this.birthday = birthday || '';
+    this.anniversary = anniversary || '';
+    this.gender = gender || '';
+    this.note = note || '';
+    this.preferredUsername = preferredUsername || '';
+    this.photos = photos || null; // ContactField[]
+    this.tags = tags || null; // ContactField[]
+    this.relationships = relationships || null; // ContactField[]
+    this.urls = urls || null; // ContactField[]
+    this.accounts = accounts || null; // ContactAccount[]
+    this.utcOffset = utcOffset || '';
+    this.connected = connected || '';
 };
 
 var ContactName = function(formatted, familyName, givenName, middle, prefix, suffix) {
@@ -43,7 +43,7 @@ var ContactField = function(type, value, primary) {
     this.primary = primary || '';
 };
 
-var ContactAddress = function() {
+var ContactAddress = function(formatted, streetAddress, locality, region, postalCode, country) {
     this.formatted = formatted || '';
     this.streetAddress = streetAddress || '';
     this.locality = locality || '';
@@ -62,6 +62,11 @@ var ContactOrganization = function(name, dept, title, startDate, endDate, locati
     this.description = desc || '';
 };
 
+var ContactAccount = function(domain, username, userid) {
+	this.domain = domain || '';
+	this.username = username || '';
+	this.userid = userid || '';
+}
 
 var Contacts = function() {
     this.inProgress = false;
